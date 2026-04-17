@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CookBook - Recipe Collections</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'poppins', sans-serif;
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.75)), 
+                  url("https://images.unsplash.com/photo-1556911220-bff31c812dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80") no-repeat center/cover;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    header nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+    }
+   
+    .nav-links a:hover {
+  color: orange;
+}
+    header h1 {
+      font-size: 3rem;
+      color: orange;
+      font-weight: 800;
+      margin: 1rem 0;
+    }
+    header p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto 1rem;
+    }
+    header input[type="text"] {
+      padding: 0.5rem;
+      width: 60%;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    .section {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .collections {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .collection-card {
+      border: 1px solid #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .collection-card:hover {
+      transform: translateY(-5px);
+    }
+    .collection-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .collection-info {
+      padding: 1rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .collection-info h3 {
+      margin-bottom: 0.5rem;
+      color: #e67e22;
+    }
+    .collection-info p {
+      color: #666;
+      margin-bottom: 0.5rem;
+      flex-grow: 1;
+    }
+    .recipes-count {
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    .price-cart {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+    }
+    .price {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #e67e22;
+    }
+    .add-to-cart {
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .add-to-cart:hover {
+      background-color: #d35400;
+    }
+    .cart-icon {
+      position: relative;
+      cursor: pointer;
+      color: white;
+    }
+    .cart-count {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+    .cart-container {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 400px;
+      height: 100vh;
+      background-color: white;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    .cart-header {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+    }
+    .close-cart {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .cart-items {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    .cart-item {
+      display: flex;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    .cart-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-right: 1rem;
+    }
+    .cart-item-info {
+      flex-grow: 1;
+    }
+    .cart-item-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .cart-item-price {
+      color: #e67e22;
+    }
+    .cart-item-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+    .quantity-control {
+      display: flex;
+      align-items: center;
+    }
+    .quantity-btn {
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+    .quantity {
+      padding: 0 0.5rem;
+    }
+    .remove-btn {
+      color: #e74c3c;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .cart-footer {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border-top: 1px solid #eee;
+    }
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    .checkout-btn {
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      width: 100%;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .checkout-btn:hover {
+      background-color: #d35400;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+      display: none;
+    }
+    .featured-collection {
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), 
+                  url("https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60") no-repeat center/cover;
+      padding: 3rem;
+      color: white;
+      margin: 2rem 0;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .featured-collection h2 {
+      color: #e67e22;
+      margin-bottom: 1rem;
+    }
+    .featured-collection p {
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+      font-size: 1.1rem;
+    }
+    .featured-btn {
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .featured-btn:hover {
+      background-color: #d35400;
+    }
+    .chef-highlight {
+      font-style: italic;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      text-align: right;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .tag {
+      background-color: #f1f1f1;
+      color: #666;
+      padding: 0.2rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+    .footer {
+      background: #f4f4f4;
+      padding: 2rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer .about {
+      max-width: 400px;
+    }
+    .footer ul {
+      list-style: none;
+    }
+    .footer li {
+      margin-bottom: 0.5rem;
+    }
+    .footer img {
+      width: 75px;
+    }
+    @media (max-width: 768px) {
+      .collections {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+      .cart-container {
+        width: 100%;
+        right: -100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="nav-links">
+        <a href="culinary.html">RECIPES</a>
+        <a href="#" class="active">COLLECTIONS</a>
+        <a href="#">ABOUT US</a>
+      </div>
+      <div class="cart-icon" id="cartIcon">
+        <span>🛒</span>
+        <span class="cart-count" id="cartCount">0</span>
+      </div>
+    </nav>
+    <h1>ANYBODY CAN COOK</h1>
+    <p>Discover curated recipe collections based on our most popular recipes. Perfect for any occasion!</p>
+    <input type="text" placeholder="Search collections...">
+  </header>
+
+  <section class="featured-collection">
+    <h2>CHEF'S CHOICE COLLECTION</h2>
+    <p>Our premium collection featuring signature recipes from Chicken Makhni to Veg Thali. Perfect for expanding your culinary repertoire with authentic, expert-crafted recipes.</p>
+    <button class="featured-btn add-to-cart" data-id="featured">Add to Cart - $49.99</button>
+  </section>
+
+  <section class="section">
+    <h2>CURATED COLLECTIONS</h2>
+    <div class="collections" id="collectionsContainer">
+      <!-- Collections will be loaded here by JavaScript -->
+    </div>
+  </section>
+
+  <div class="overlay" id="overlay"></div>
+  
+  <div class="cart-container" id="cartContainer">
+    <div class="cart-header">
+      <h3>Your Recipe Collection</h3>
+      <button class="close-cart" id="closeCart">×</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <!-- Cart items will be loaded here by JavaScript -->
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cartTotal">$0.00</span>
+      </div>
+      <button class="checkout-btn">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="about">
+      <h3>About Us</h3>
+      <p>Our mission at CookBook is to make everyday cooking fun and meaningful by sharing recipes and cooking tips to bring people together.</p>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/App_Store_%28iOS%29.svg" alt="App Store">
+    </div>
+    <div>
+      <h3>Learn More</h3>
+      <ul>
+        <li><a href="#">CookBook Community</a></li>
+        <li><a href="#">Feedback</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Collection data based on the original website recipes
+    const collections = [
+      {
+        id: 101,
+        name: "Indian Cuisine Collection",
+        description: "Explore the rich flavors of India with this collection featuring Chicken Makhni, Veg Thali, and authentic Biryani recipes.",
+        price: 29.99,
+        image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
+        recipes: 10,
+        tags: ["Indian", "Spicy", "Classic"]
+      },
+      {
+        id: 102,
+        name: "Quick & Easy Recipes",
+        description: "Perfect for busy weeknights, this collection includes simple, delicious recipes that can be prepared in 30 minutes or less.",
+        price: 19.99,
+        image: "https://images.unsplash.com/photo-1528712306091-ed0763094c98?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
+        recipes: 15,
+        tags: ["Quick", "Easy", "Weeknight"]
+      },
+      {
+        id: 103,
+        name: "Vegetarian Delights",
+        description: "A comprehensive collection of vegetarian recipes from simple veg thalis to innovative plant-based dishes that will satisfy any palate.",
+        price: 24.99,
+        image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
+        recipes: 12,
+        tags: ["Vegetarian", "Healthy", "Plant-based"]
+      },
+      {
+        id: 104,
+        name: "International Cuisine",
+        description: "Take your taste buds on a global adventure with recipes from around the world, featuring diverse flavors and cooking techniques.",
+        price: 34.99,
+        image: "https://images.unsplash.com/photo-1515669097368-22e68427d265?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
+        recipes: 18,
+        tags: ["International", "Global", "Diverse"]
+      },
+      {
+        id: 105,
+        name: "Sweet Treats & Desserts",
+        description: "Indulge your sweet tooth with this collection of dessert recipes, including traditional favorites and creative new concoctions.",
+        price: 22.99,
+        image: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
+        recipes: 14,
+        tags: ["Desserts", "Sweet", "Baking"]
+      },
+      {
+        id: 106,
+        name: "Beverage Collection",
+        description: "Refresh and delight with our beverage collection, featuring everything from Jigarthanda to other refreshing drinks for any occasion.",
+        price: 18.99,
+        image: "https://images.unsplash.com/photo-1544145945-f90425340c7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
+        recipes: 8,
+        tags: ["Drinks", "Beverages", "Refreshing"]
+      },
+      {
+        id: 107,
+        name: "Lunch Box Ideas",
+        description: "Perfect solutions for packing delicious lunches for kids and adults alike, with recipes that travel well and stay fresh.",
+        price: 21.99,
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
+        recipes: 10,
+        tags: ["Lunch", "Kids", "Meal Prep"]
+      },
+      {
+        id: 108,
+        name: "BBQ & Grilling",
+        description: "Master the art of outdoor cooking with this collection of grilling and BBQ recipes perfect for summer gatherings and cookouts.",
+        price: 26.99,
+        image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
+        recipes: 12,
+        tags: ["BBQ", "Grilling", "Outdoor"]
+      }
+    ];
+
+    // DOM Elements
+    const collectionsContainer = document.getElementById('collectionsContainer');
+    const cartCount = document.getElementById('cartCount');
+    const cartIcon = document.getElementById('cartIcon');
+    const cartContainer = document.getElementById('cartContainer');
+    const closeCart = document.getElementById('closeCart');
+    const overlay = document.getElementById('overlay');
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const featuredBtn = document.querySelector('.featured-btn');
+
+    // Cart data
+    let cart = [];
+
+    // Load cart from local storage
+    function loadCart() {
+      const savedCart = localStorage.getItem('cookbookCart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+        updateCartCount();
+        updateCartDisplay();
+      }
+    }
+
+    // Save cart to local storage
+    function saveCart() {
+      localStorage.setItem('cookbookCart', JSON.stringify(cart));
+    }
+
+    // Update cart count display
+    function updateCartCount() {
+      const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+      cartCount.textContent = totalItems;
+    }
+
+    // Display collections
+    function displayCollections() {
+      collectionsContainer.innerHTML = '';
+      
+      collections.forEach(collection => {
+        const collectionCard = document.createElement('div');
+        collectionCard.className = 'collection-card';
+        
+        // Create tags HTML
+        const tagsHTML = collection.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+        
+        collectionCard.innerHTML = `
+          <img src="${collection.image}" alt="${collection.name}">
+          <div class="collection-info">
+            <h3>${collection.name}</h3>
+            <p>${collection.description}</p>
+            <div class="recipes-count">${collection.recipes} Recipes</div>
+            <div class="tags">${tagsHTML}</div>
+            <div class="price-cart">
+              <span class="price">$${collection.price.toFixed(2)}</span>
+              <button class="add-to-cart" data-id="${collection.id}">Add to Cart</button>
+            </div>
+          </div>
+        `;
+        collectionsContainer.appendChild(collectionCard);
+      });
+
+      // Add event listeners to Add to Cart buttons
+      document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', () => {
+          const collectionId = button.getAttribute('data-id');
+          
+          if (collectionId === 'featured') {
+            addToCart('featured', 'Chef\'s Choice Collection', 49.99, 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60');
+          } else {
+            const id = parseInt(collectionId);
+            const collection = collections.find(c => c.id === id);
+            if (collection) {
+              addToCart(collection.id, collection.name, collection.price, collection.image);
+            }
+          }
+        });
+      });
+    }
+
+    // Add collection to cart
+    function addToCart(id, name, price, image) {
+      const existingItem = cart.find(item => item.id === id);
+      
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({
+          id: id,
+          name: name,
+          price: price,
+          image: image,
+          quantity: 1
+        });
+      }
+
+      updateCartCount();
+      updateCartDisplay();
+      saveCart();
+      
+      // Show cart briefly
+      openCart();
+      setTimeout(() => {
+        closeCartPanel();
+      }, 2000);
+    }
+
+    // Update cart display
+    function updateCartDisplay() {
+      cartItems.innerHTML = '';
+      
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<p>Your cart is empty.</p>';
+        cartTotal.textContent = '$0.00';
+        return;
+      }
+
+      let total = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+          <img src="${item.image}" alt="${item.name}">
+          <div class="cart-item-info">
+            <div class="cart-item-title">${item.name}</div>
+            <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+            <div class="cart-item-actions">
+              <div class="quantity-control">
+                <div class="quantity-btn decrease" data-id="${item.id}">-</div>
+                <div class="quantity">${item.quantity}</div>
+                <div class="quantity-btn increase" data-id="${item.id}">+</div>
+              </div>
+              <button class="remove-btn" data-id="${item.id}">Remove</button>
+            </div>
+          </div>
+        `;
+        cartItems.appendChild(cartItem);
+      });
+
+      cartTotal.textContent = `$${total.toFixed(2)}`;
+
+      // Add event listeners to cart item buttons
+      document.querySelectorAll('.decrease').forEach(btn => {
+        btn.addEventListener('click', () => {
+          updateQuantity(btn.getAttribute('data-id'), -1);
+        });
+      });
+
+      document.querySelectorAll('.increase').forEach(btn => {
+        btn.addEventListener('click', () => {
+          updateQuantity(btn.getAttribute('data-id'), 1);
+        });
+      });
+
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          removeFromCart(btn.getAttribute('data-id'));
+        });
+      });
+    }
+
+    // Update item quantity
+    function updateQuantity(itemId, change) {
+      const itemIndex = cart.findIndex(item => item.id.toString() === itemId.toString());
+      if (itemIndex === -1) return;
+
+      cart[itemIndex].quantity += change;
+      
+      if (cart[itemIndex].quantity <= 0) {
+        cart.splice(itemIndex, 1);
+      }
+
+      updateCartCount();
+      updateCartDisplay();
+      saveCart();
+    }
+
+    // Remove item from cart
+    function removeFromCart(itemId) {
+      cart = cart.filter(item => item.id.toString() !== itemId.toString());
+      updateCartCount();
+      updateCartDisplay();
+      saveCart();
+    }
+
+    // Open cart panel
+    function openCart() {
+      cartContainer.style.right = '0';
+      overlay.style.display = 'block';
+    }
+
+    // Close cart panel
+    function closeCartPanel() {
+      cartContainer.style.right = '-400px';
+      overlay.style.display = 'none';
+    }
+
+    // Initialize
+    function init() {
+      // Display collections
+      displayCollections();
+      
+      // Load cart from local storage
+      loadCart();
+      
+      // Event listeners
+      cartIcon.addEventListener('click', openCart);
+      closeCart.addEventListener('click', closeCartPanel);
+      overlay.addEventListener('click', closeCartPanel);
+    }
+
+    // Initialize the app when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
